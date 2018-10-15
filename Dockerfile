@@ -1,15 +1,14 @@
-FROM python:2.7-alpine
+FROM python:2.7-slim
 
-# Install packages needed for build
-RUN apk add --no-cache --virtual .build-deps \
-    build-base \
+# We purposely install NumPy & SciPy via package manager, for faster builds
+RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
-    linux-headers \
-    git
-
-RUN apk add --no-cache \
-    yaml \
-    yaml-dev
+    python-dev \
+    git \
+    libyaml-dev \
+    libyaml-dev \
+    python-numpy \
+    python-scipy
 
 RUN mkdir /usr/src/openfisca
 WORKDIR /usr/src/openfisca
@@ -19,9 +18,6 @@ COPY config.py ./
 COPY requirements.txt ./
 
 RUN pip install --upgrade -r requirements.txt
-
-# Remove packages not needed after build
-RUN apk del .build-deps
 
 COPY docker-entrypoint.sh /
 
